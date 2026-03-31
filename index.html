@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Elvis Segovia — Backend & Infrastructure Engineer</title>
+  <meta name="description" content="Portfolio of Elvis Segovia, a Senior Backend & Infrastructure Engineer who builds scalable systems that handle real-world load." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- AOS (Animate On Scroll) -->
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* ── Reset & Base ───────────────────────────── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:        #0a0a0b;
+      --bg-card:   #111113;
+      --bg-card-h: #18181b;
+      --border:    #222225;
+      --text:      #e4e4e7;
+      --text-dim:  #71717a;
+      --accent:    #6d28d9;
+      --accent-l:  #8b5cf6;
+      --accent-ll: #a78bfa;
+      --white:     #fafafa;
+      --font:      'Inter', system-ui, sans-serif;
+      --mono:      'JetBrains Mono', monospace;
+      --radius:    12px;
+      --max-w:     1120px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    ::selection { background: var(--accent); color: #fff; }
+
+    a { color: var(--accent-l); text-decoration: none; transition: color .2s; }
+    a:hover { color: var(--accent-ll); }
+
+    img { max-width: 100%; display: block; }
+
+    /* ── Noise overlay ──────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: .035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 200px;
+    }
+
+    /* ── Animated gradient blobs ─────────────────── */
+    .gradient-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+    }
+    .gradient-bg .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: .12;
+      animation: float 20s ease-in-out infinite alternate;
+    }
+    .gradient-bg .blob:nth-child(1) {
+      width: 600px; height: 600px;
+      background: var(--accent);
+      top: -10%; left: -10%;
+    }
+    .gradient-bg .blob:nth-child(2) {
+      width: 500px; height: 500px;
+      background: #2563eb;
+      bottom: -10%; right: -10%;
+      animation-delay: -7s;
+    }
+    .gradient-bg .blob:nth-child(3) {
+      width: 350px; height: 350px;
+      background: #7c3aed;
+      top: 40%; left: 50%;
+      animation-delay: -14s;
+    }
+    @keyframes float {
+      0%   { transform: translate(0, 0) scale(1); }
+      50%  { transform: translate(60px, -40px) scale(1.1); }
+      100% { transform: translate(-30px, 50px) scale(.95); }
+    }
+
+    /* ── Container ──────────────────────────────── */
+    .container { max-width: var(--max-w); margin: 0 auto; padding: 0 24px; }
+
+    /* ── Navbar ─────────────────────────────────── */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(10,10,11,.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid transparent;
+      transition: border-color .3s;
+    }
+    .navbar.scrolled { border-color: var(--border); }
+    .navbar .container {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .navbar .logo {
+      font-weight: 700; font-size: 1.1rem; color: var(--white);
+      letter-spacing: -.02em;
+    }
+    .navbar .logo span { color: var(--accent-l); }
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-links a {
+      color: var(--text-dim); font-size: .875rem; font-weight: 500;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--white); }
+    .mobile-toggle {
+      display: none; background: none; border: none;
+      color: var(--text); cursor: pointer;
+    }
+
+    /* Mobile menu */
+    @media (max-width: 768px) {
+      .nav-links {
+        position: fixed; top: 64px; left: 0; right: 0; bottom: 0;
+        flex-direction: column; align-items: center; justify-content: center;
+        gap: 40px;
+        background: rgba(10,10,11,.95);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        transform: translateX(100%);
+        transition: transform .35s ease;
+      }
+      .nav-links.open { transform: translateX(0); }
+      .nav-links a { font-size: 1.25rem; }
+      .mobile-toggle { display: block; }
+    }
+
+    /* ── Sections ───────────────────────────────── */
+    section { padding: 120px 0; }
+    .section-label {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--mono); font-size: .75rem; font-weight: 500;
+      text-transform: uppercase; letter-spacing: .1em;
+      color: var(--accent-l); margin-bottom: 16px;
+    }
+    .section-label::before {
+      content: ''; width: 24px; height: 1px; background: var(--accent-l);
+    }
+    .section-title {
+      font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 700;
+      color: var(--white); margin-bottom: 20px; letter-spacing: -.02em;
+    }
+    .section-subtitle {
+      color: var(--text-dim); font-size: 1.05rem; max-width: 600px;
+      margin-bottom: 48px;
+    }
+
+    /* ── Hero ───────────────────────────────────── */
+    .hero {
+      min-height: 100vh; display: flex; align-items: center;
+      padding-top: 64px;
+    }
+    .hero .container {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 60px;
+    }
+    .hero-content { max-width: 720px; }
+    .hero .greeting {
+      font-family: var(--mono); font-size: .875rem;
+      color: var(--accent-l); margin-bottom: 16px;
+    }
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 700;
+      color: var(--white); line-height: 1.1; letter-spacing: -.03em;
+      margin-bottom: 20px;
+    }
+    .hero h1 .highlight {
+      background: linear-gradient(135deg, var(--accent-l), #2563eb);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      font-size: 1.15rem; color: var(--text-dim);
+      max-width: 540px; margin-bottom: 36px;
+    }
+    .hero-buttons { display: flex; gap: 16px; flex-wrap: wrap; }
+
+    /* ── Hero Profile Photo ────────────────────── */
+    .hero-photo {
+      position: relative;
+      flex-shrink: 0;
+    }
+    .hero-photo img {
+      width: 280px; height: 280px;
+      border-radius: 50%;
+      object-fit: cover;
+      object-position: center top;
+      border: 3px solid var(--border);
+      transition: border-color .4s, transform .4s;
+      position: relative;
+      z-index: 2;
+    }
+    .hero-photo img:hover {
+      border-color: var(--accent-l);
+      transform: scale(1.03);
+    }
+    .hero-photo::before {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #2563eb, var(--accent-l));
+      opacity: .4;
+      z-index: 1;
+      animation: photo-glow 4s ease-in-out infinite alternate;
+    }
+    .hero-photo::after {
+      content: '';
+      position: absolute;
+      inset: -20px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+      opacity: .1;
+      z-index: 0;
+      filter: blur(20px);
+    }
+    @keyframes photo-glow {
+      0%   { opacity: .25; transform: rotate(0deg); }
+      100% { opacity: .5; transform: rotate(360deg); }
+    }
+    @media (max-width: 768px) {
+      .hero .container {
+        grid-template-columns: 1fr;
+        text-align: center;
+        justify-items: center;
+      }
+      .hero-photo { order: -1; }
+      .hero-photo img { width: 200px; height: 200px; }
+      .hero-buttons { justify-content: center; }
+      .hero p { margin-left: auto; margin-right: auto; }
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 28px; border-radius: 8px; font-weight: 600;
+      font-size: .9rem; cursor: pointer; border: none;
+      transition: all .25s;
+    }
+    .btn-primary {
+      background: var(--accent); color: #fff;
+    }
+    .btn-primary:hover { background: var(--accent-l); color: #fff; transform: translateY(-2px); }
+    .btn-secondary {
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--accent-l); color: var(--white); transform: translateY(-2px); }
+
+    .scroll-hint {
+      position: absolute; bottom: 40px; left: 50%;
+      transform: translateX(-50%);
+      animation: bounce 2s infinite;
+    }
+    .scroll-hint i { color: var(--text-dim); }
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(8px); }
+    }
+
+    /* ── About ──────────────────────────────────── */
+    .about-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 48px; align-items: center;
+    }
+    .about-text p { color: var(--text-dim); margin-bottom: 16px; font-size: 1.02rem; }
+    .about-text p strong { color: var(--text); }
+    .about-stats {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+    }
+    .stat-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 24px;
+      transition: border-color .25s, transform .25s;
+    }
+    .stat-card:hover { border-color: var(--accent); transform: translateY(-4px); }
+    .stat-card .number {
+      font-size: 2rem; font-weight: 700; color: var(--accent-l);
+      font-family: var(--mono);
+    }
+    .stat-card .label { color: var(--text-dim); font-size: .85rem; margin-top: 4px; }
+
+    @media (max-width: 768px) {
+      .about-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── Achievements ───────────────────────────── */
+    .achievements-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+    .achievement-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 28px;
+      transition: border-color .25s, transform .25s;
+      position: relative; overflow: hidden;
+    }
+    .achievement-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0;
+      height: 2px; background: linear-gradient(90deg, var(--accent), var(--accent-l));
+      transform: scaleX(0); transition: transform .35s;
+      transform-origin: left;
+    }
+    .achievement-card:hover::before { transform: scaleX(1); }
+    .achievement-card:hover { border-color: var(--accent); transform: translateY(-4px); }
+    .achievement-card .icon {
+      width: 40px; height: 40px; border-radius: 8px;
+      background: rgba(109,40,217,.15);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px; color: var(--accent-l);
+    }
+    .achievement-card h3 { font-size: 1rem; color: var(--white); margin-bottom: 8px; }
+    .achievement-card p { font-size: .875rem; color: var(--text-dim); }
+
+    /* ── Projects ───────────────────────────────── */
+    .projects-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 24px;
+    }
+    .project-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 32px;
+      transition: border-color .3s, transform .3s;
+      display: flex; flex-direction: column;
+    }
+    .project-card:hover { border-color: var(--accent); transform: translateY(-6px); }
+    .project-card .project-header {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 16px;
+    }
+    .project-card .project-icon {
+      width: 48px; height: 48px; border-radius: 10px;
+      background: rgba(109,40,217,.12);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--accent-l);
+    }
+    .project-card .project-link {
+      color: var(--text-dim); transition: color .2s;
+    }
+    .project-card .project-link:hover { color: var(--accent-l); }
+    .project-card h3 {
+      font-size: 1.15rem; color: var(--white); margin-bottom: 10px;
+    }
+    .project-card .desc {
+      font-size: .9rem; color: var(--text-dim); margin-bottom: 20px;
+      flex: 1;
+    }
+    .project-card .challenges {
+      margin-bottom: 20px; padding-left: 0; list-style: none;
+    }
+    .project-card .challenges li {
+      font-size: .825rem; color: var(--text-dim);
+      padding: 4px 0 4px 18px; position: relative;
+    }
+    .project-card .challenges li::before {
+      content: ''; position: absolute; left: 0; top: 12px;
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent-l);
+    }
+    .tech-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tech-tag {
+      font-family: var(--mono); font-size: .7rem; font-weight: 500;
+      padding: 4px 10px; border-radius: 6px;
+      background: rgba(109,40,217,.1); color: var(--accent-ll);
+      border: 1px solid rgba(109,40,217,.2);
+    }
+
+    /* ── Tech Stack ─────────────────────────────── */
+    .stack-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    .stack-group {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 24px;
+      transition: border-color .25s, transform .25s;
+    }
+    .stack-group:hover { border-color: var(--accent); transform: translateY(-4px); }
+    .stack-group h3 {
+      font-size: .8rem; text-transform: uppercase; letter-spacing: .08em;
+      color: var(--accent-l); margin-bottom: 16px;
+      font-family: var(--mono);
+    }
+    .stack-group ul { list-style: none; }
+    .stack-group li {
+      padding: 6px 0; font-size: .9rem; color: var(--text-dim);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .stack-group li::before {
+      content: ''; width: 4px; height: 4px; border-radius: 50%;
+      background: var(--accent-l); flex-shrink: 0;
+    }
+
+    /* ── Philosophy ─────────────────────────────── */
+    .philosophy-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .philosophy-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 32px;
+      transition: border-color .25s, transform .25s;
+      position: relative;
+    }
+    .philosophy-card:hover { border-color: var(--accent); transform: translateY(-4px); }
+    .philosophy-card .quote-mark {
+      font-size: 3rem; font-weight: 700; color: var(--accent);
+      opacity: .3; line-height: 1; margin-bottom: 8px;
+    }
+    .philosophy-card p {
+      font-size: 1.05rem; color: var(--text); font-weight: 500;
+      font-style: italic;
+    }
+
+    /* ── Contact ────────────────────────────────── */
+    .contact-inner {
+      text-align: center; max-width: 560px; margin: 0 auto;
+    }
+    .contact-inner .section-subtitle { margin-left: auto; margin-right: auto; }
+    .contact-links {
+      display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;
+    }
+    .contact-link {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 14px 28px; border-radius: 10px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      color: var(--text); font-weight: 500; font-size: .9rem;
+      transition: all .25s;
+    }
+    .contact-link:hover {
+      border-color: var(--accent); color: var(--white);
+      transform: translateY(-3px);
+    }
+    .contact-link i { color: var(--accent-l); }
+
+    /* ── Footer ─────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border); padding: 32px 0;
+      text-align: center; color: var(--text-dim); font-size: .8rem;
+    }
+
+    /* ── Utilities ──────────────────────────────── */
+    @media (max-width: 500px) {
+      .projects-grid { grid-template-columns: 1fr; }
+      section { padding: 80px 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Animated background -->
+  <div class="gradient-bg">
+    <div class="blob"></div>
+    <div class="blob"></div>
+    <div class="blob"></div>
+  </div>
+
+  <!-- ── Navbar ────────────────────────────────── -->
+  <nav class="navbar" id="navbar">
+    <div class="container">
+      <a href="#hero" class="logo">elvis<span>.</span>segovia</a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#about" onclick="closeMenu()">About</a></li>
+        <li><a href="#achievements" onclick="closeMenu()">Impact</a></li>
+        <li><a href="#projects" onclick="closeMenu()">Projects</a></li>
+        <li><a href="#stack" onclick="closeMenu()">Stack</a></li>
+        <li><a href="#contact" onclick="closeMenu()">Contact</a></li>
+      </ul>
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">
+        <i data-lucide="menu" style="width:24px;height:24px"></i>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ── Hero ──────────────────────────────────── -->
+  <section class="hero" id="hero">
+    <div class="container">
+      <div class="hero-content" data-aos="fade-right" data-aos-duration="800">
+        <p class="greeting">// Hello, I'm</p>
+        <h1>Elvis <span class="highlight">Segovia</span></h1>
+        <p>Backend &amp; Infrastructure Engineer — I build scalable systems that handle real-world load.</p>
+        <div class="hero-buttons">
+          <a href="#projects" class="btn btn-primary">
+            <i data-lucide="folder-open" style="width:18px;height:18px"></i>
+            View Projects
+          </a>
+          <a href="#contact" class="btn btn-secondary">
+            <i data-lucide="mail" style="width:18px;height:18px"></i>
+            Contact
+          </a>
+        </div>
+      </div>
+      <div class="hero-photo" data-aos="fade-left" data-aos-duration="800" data-aos-delay="200">
+        <img src="profile.jpg" alt="Elvis Segovia" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ── About ─────────────────────────────────── -->
+  <section id="about">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-text" data-aos="fade-right" data-aos-duration="700">
+          <span class="section-label">About</span>
+          <h2 class="section-title">Building infrastructure<br>that doesn't flinch</h2>
+          <p>
+            I specialize in designing and operating <strong>high-performance backend systems</strong> and the <strong>Kubernetes-based infrastructure</strong> that keeps them running under real production pressure.
+          </p>
+          <p>
+            From orchestrating microservices to implementing observability pipelines, I focus on the kind of engineering that shows up in <strong>uptime graphs, not slide decks</strong>.  Every system I touch is built to be debuggable, scalable, and production-ready.
+          </p>
+        </div>
+        <div class="about-stats" data-aos="fade-left" data-aos-duration="700" data-aos-delay="150">
+          <div class="stat-card">
+            <div class="number">K8s</div>
+            <div class="label">Orchestration & Scaling</div>
+          </div>
+          <div class="stat-card">
+            <div class="number">Go</div>
+            <div class="label">Primary Language</div>
+          </div>
+          <div class="stat-card">
+            <div class="number">24/7</div>
+            <div class="label">Observability Focus</div>
+          </div>
+          <div class="stat-card">
+            <div class="number">Prod</div>
+            <div class="label">Battle-Tested Systems</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Achievements ──────────────────────────── -->
+  <section id="achievements">
+    <div class="container">
+      <span class="section-label" data-aos="fade-up">Impact</span>
+      <h2 class="section-title" data-aos="fade-up" data-aos-delay="50">What I've shipped</h2>
+      <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">Measurable results from real production systems.</p>
+      <div class="achievements-grid">
+        <div class="achievement-card" data-aos="fade-up" data-aos-delay="100">
+          <div class="icon"><i data-lucide="zap" style="width:20px;height:20px"></i></div>
+          <h3>High-Scale URL Shortener</h3>
+          <p>Engineered a URL shortener built to sustain heavy write throughput with consistent low-latency reads under load.</p>
+        </div>
+        <div class="achievement-card" data-aos="fade-up" data-aos-delay="200">
+          <div class="icon"><i data-lucide="repeat" style="width:20px;height:20px"></i></div>
+          <h3>Async Processing with RabbitMQ</h3>
+          <p>Designed event-driven pipelines with RabbitMQ to decouple services and guarantee reliable message delivery at scale.</p>
+        </div>
+        <div class="achievement-card" data-aos="fade-up" data-aos-delay="300">
+          <div class="icon"><i data-lucide="shield-check" style="width:20px;height:20px"></i></div>
+          <h3>Multi-IDP Auth System</h3>
+          <p>Built a unified authentication layer supporting multiple identity providers with seamless token federation.</p>
+        </div>
+        <div class="achievement-card" data-aos="fade-up" data-aos-delay="400">
+          <div class="icon"><i data-lucide="activity" style="width:20px;height:20px"></i></div>
+          <h3>Observability Stack</h3>
+          <p>Deployed and tuned Prometheus, Grafana, and Loki for full-stack observability across distributed services.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Projects ──────────────────────────────── -->
+  <section id="projects">
+    <div class="container">
+      <span class="section-label" data-aos="fade-up">Projects</span>
+      <h2 class="section-title" data-aos="fade-up" data-aos-delay="50">Selected work</h2>
+      <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">Systems designed for throughput, resilience, and clarity.</p>
+      <div class="projects-grid">
+
+        <!-- Project 1 -->
+        <div class="project-card" data-aos="fade-up" data-aos-delay="100">
+          <div class="project-header">
+            <div class="project-icon"><i data-lucide="link" style="width:24px;height:24px"></i></div>
+            <a href="#" class="project-link" aria-label="GitHub"><i data-lucide="github" style="width:20px;height:20px"></i></a>
+          </div>
+          <h3>High-Scale URL Shortener</h3>
+          <p class="desc">A URL shortening service designed from the ground up for high write throughput and predictable read latency, even under sustained load.</p>
+          <ul class="challenges">
+            <li>Write-optimized storage layer with conflict-free ID generation</li>
+            <li>Caching strategy for hot links with graceful invalidation</li>
+            <li>Rate limiting and abuse prevention at the edge</li>
+          </ul>
+          <div class="tech-tags">
+            <span class="tech-tag">Go</span>
+            <span class="tech-tag">MongoDB</span>
+            <span class="tech-tag">Redis</span>
+            <span class="tech-tag">Docker</span>
+          </div>
+        </div>
+
+        <!-- Project 2 -->
+        <div class="project-card" data-aos="fade-up" data-aos-delay="200">
+          <div class="project-header">
+            <div class="project-icon"><i data-lucide="key-round" style="width:24px;height:24px"></i></div>
+            <a href="#" class="project-link" aria-label="GitHub"><i data-lucide="github" style="width:20px;height:20px"></i></a>
+          </div>
+          <h3>Multi-IDP KrakenD Plugin</h3>
+          <p class="desc">A custom KrakenD plugin enabling seamless authentication across multiple identity providers with dynamic token validation and routing.</p>
+          <ul class="challenges">
+            <li>Runtime IDP discovery and JWKS rotation handling</li>
+            <li>Per-route auth policy configuration</li>
+            <li>Zero-downtime provider onboarding</li>
+          </ul>
+          <div class="tech-tags">
+            <span class="tech-tag">Go</span>
+            <span class="tech-tag">KrakenD</span>
+            <span class="tech-tag">Keycloak</span>
+            <span class="tech-tag">JWT</span>
+          </div>
+        </div>
+
+        <!-- Project 3 -->
+        <div class="project-card" data-aos="fade-up" data-aos-delay="300">
+          <div class="project-header">
+            <div class="project-icon"><i data-lucide="brain" style="width:24px;height:24px"></i></div>
+            <a href="#" class="project-link" aria-label="GitHub"><i data-lucide="github" style="width:20px;height:20px"></i></a>
+          </div>
+          <h3>AI Context Server (MemexCore)</h3>
+          <p class="desc">An intelligent context management server that provides LLMs with structured, relevant context from codebases and knowledge bases.</p>
+          <ul class="challenges">
+            <li>Efficient chunking and embedding pipeline</li>
+            <li>Context window optimization for token budgets</li>
+            <li>Hybrid retrieval combining vector + keyword search</li>
+          </ul>
+          <div class="tech-tags">
+            <span class="tech-tag">Go</span>
+            <span class="tech-tag">PostgreSQL</span>
+            <span class="tech-tag">Vector DB</span>
+            <span class="tech-tag">REST API</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Tech Stack ────────────────────────────── -->
+  <section id="stack">
+    <div class="container">
+      <span class="section-label" data-aos="fade-up">Stack</span>
+      <h2 class="section-title" data-aos="fade-up" data-aos-delay="50">Tools of the trade</h2>
+      <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">Technologies I use to build and operate production systems.</p>
+      <div class="stack-grid">
+        <div class="stack-group" data-aos="fade-up" data-aos-delay="100">
+          <h3>Backend</h3>
+          <ul>
+            <li>Go</li>
+            <li>Node.js</li>
+          </ul>
+        </div>
+        <div class="stack-group" data-aos="fade-up" data-aos-delay="150">
+          <h3>Infrastructure</h3>
+          <ul>
+            <li>Kubernetes</li>
+            <li>Docker</li>
+            <li>Helm</li>
+          </ul>
+        </div>
+        <div class="stack-group" data-aos="fade-up" data-aos-delay="200">
+          <h3>Data</h3>
+          <ul>
+            <li>MongoDB</li>
+            <li>PostgreSQL</li>
+          </ul>
+        </div>
+        <div class="stack-group" data-aos="fade-up" data-aos-delay="250">
+          <h3>Observability</h3>
+          <ul>
+            <li>Prometheus</li>
+            <li>Grafana</li>
+            <li>Loki</li>
+          </ul>
+        </div>
+        <div class="stack-group" data-aos="fade-up" data-aos-delay="300">
+          <h3>Auth</h3>
+          <ul>
+            <li>Keycloak</li>
+            <li>JWT</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Philosophy ────────────────────────────── -->
+  <section id="philosophy">
+    <div class="container">
+      <span class="section-label" data-aos="fade-up">Philosophy</span>
+      <h2 class="section-title" data-aos="fade-up" data-aos-delay="50">How I think about engineering</h2>
+      <div class="philosophy-grid">
+        <div class="philosophy-card" data-aos="fade-up" data-aos-delay="100">
+          <div class="quote-mark">"</div>
+          <p>Design for scale from day one.</p>
+        </div>
+        <div class="philosophy-card" data-aos="fade-up" data-aos-delay="200">
+          <div class="quote-mark">"</div>
+          <p>Optimize for real-world traffic, not demos.</p>
+        </div>
+        <div class="philosophy-card" data-aos="fade-up" data-aos-delay="300">
+          <div class="quote-mark">"</div>
+          <p>Infrastructure is part of the product.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Contact ───────────────────────────────── -->
+  <section id="contact">
+    <div class="container">
+      <div class="contact-inner">
+        <span class="section-label" data-aos="fade-up">Contact</span>
+        <h2 class="section-title" data-aos="fade-up" data-aos-delay="50">Let's connect</h2>
+        <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
+          Interested in working together or just want to talk backend &amp; infra? Reach out.
+        </p>
+        <div class="contact-links" data-aos="fade-up" data-aos-delay="200">
+          <a href="https://github.com/elvissegovia" class="contact-link" target="_blank" rel="noopener">
+            <i data-lucide="github" style="width:20px;height:20px"></i> GitHub
+          </a>
+          <a href="https://linkedin.com/in/elvissegovia" class="contact-link" target="_blank" rel="noopener">
+            <i data-lucide="linkedin" style="width:20px;height:20px"></i> LinkedIn
+          </a>
+          <a href="mailto:hello@elvissegovia.dev" class="contact-link">
+            <i data-lucide="mail" style="width:20px;height:20px"></i> Email
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Footer ────────────────────────────────── -->
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 Elvis Segovia. Built with precision.</p>
+    </div>
+  </footer>
+
+  <!-- AOS -->
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+
+  <script>
+    // ── Init AOS ──────────────────────────────────
+    AOS.init({ once: true, offset: 80 });
+
+    // ── Init Lucide Icons ─────────────────────────
+    lucide.createIcons();
+
+    // ── Navbar scroll effect ──────────────────────
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 20);
+    });
+
+    // ── Mobile menu ───────────────────────────────
+    const mobileToggle = document.getElementById('mobileToggle');
+    const navLinks = document.getElementById('navLinks');
+    let menuOpen = false;
+
+    mobileToggle.addEventListener('click', () => {
+      menuOpen = !menuOpen;
+      navLinks.classList.toggle('open', menuOpen);
+      // Swap icon
+      mobileToggle.innerHTML = menuOpen
+        ? '<i data-lucide="x" style="width:24px;height:24px"></i>'
+        : '<i data-lucide="menu" style="width:24px;height:24px"></i>';
+      lucide.createIcons();
+    });
+
+    function closeMenu() {
+      menuOpen = false;
+      navLinks.classList.remove('open');
+      mobileToggle.innerHTML = '<i data-lucide="menu" style="width:24px;height:24px"></i>';
+      lucide.createIcons();
+    }
+
+    // ── Active nav link on scroll ─────────────────
+    const sections = document.querySelectorAll('section[id]');
+    const navAnchors = document.querySelectorAll('.nav-links a');
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          navAnchors.forEach(a => {
+            a.style.color = a.getAttribute('href') === '#' + entry.target.id
+              ? 'var(--white)' : '';
+          });
+        }
+      });
+    }, { rootMargin: '-40% 0px -55% 0px' });
+
+    sections.forEach(s => observer.observe(s));
+  </script>
+
+</body>
+</html>
